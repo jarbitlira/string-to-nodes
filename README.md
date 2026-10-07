@@ -66,7 +66,7 @@ type ReplacerRule<T> = {
   ) => T;
   textFn?: (rawText: string, match: Omit<ReplacerMatch, 'text'>) => string;
   ignore?: string[];
-  caseSensitive?: boolean; // string patterns only; default false
+  caseSensitive?: boolean; // string patterns only; default true
   count?: number;          // max replacements for this rule, whole call
 };
 
@@ -75,7 +75,7 @@ type ReplacerRules<T> = Record<string, ReplacerRule<T>>;
 function stringReplacer<T>(
   input: ReplacerInput<T>,
   rules: ReplacerRules<T>,
-  options?: {parentKey?: string} | string, // string = parentKey shorthand; default '0'
+  options?: {parentKey?: string}, // default parentKey '0'
 ): ReplacerOutput<T>;
 
 function defineRules<T>(rules: ReplacerRules<T>): ReplacerRules<T>; // typing helper
@@ -164,13 +164,13 @@ stringReplacer<Node>('hey hey you', {hey: {pattern: 'hey', count: 1, matcherFn: 
 // [{tag:'i', key:'0-0', children:['hey']}, ' hey you']
 ```
 
-Literal strings are case-insensitive by default; use `caseSensitive: true` to opt out.
+Literal strings are case-sensitive by default; pass `caseSensitive: false` to opt in to case-insensitive matching.
 
 **Chaining**
 
 ```ts
 let out = stringReplacer(text, {url: URL_RULE});
-out = stringReplacer(out, {mention: MENTION_RULE}, '1'); // existing nodes pass through
+out = stringReplacer(out, {mention: MENTION_RULE}, {parentKey: '1'}); // existing nodes pass through
 ```
 
 Prefer one rules object; chaining is mainly for incremental migration.

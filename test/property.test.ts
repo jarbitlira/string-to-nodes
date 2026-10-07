@@ -93,8 +93,8 @@ test('key uniqueness holds across chained calls with distinct parentKey', () => 
   type K = {tag: string; key: string};
   const el = (name: string) => (_r: string, _p: unknown, key: string): K => ({tag: name, key});
 
-  const first = stringReplacer<K>('hi @ann and @bob', {m: {pattern: /@\w+/g, matcherFn: el('mention')}}, '0');
-  const second = stringReplacer<K>('hi #a and #b', {h: {pattern: /#\w+/g, matcherFn: el('hashtag')}}, '1');
+  const first = stringReplacer<K>('hi @ann and @bob', {m: {pattern: /@\w+/g, matcherFn: el('mention')}}, {parentKey: '0'});
+  const second = stringReplacer<K>('hi #a and #b', {h: {pattern: /#\w+/g, matcherFn: el('hashtag')}}, {parentKey: '1'});
 
   const keys = [...first, ...second].filter((x): x is K => typeof x !== 'string').map(n => n.key);
   assert.equal(new Set(keys).size, keys.length, `duplicate keys across chained calls: ${keys.join(', ')}`);

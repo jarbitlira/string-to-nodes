@@ -22,7 +22,7 @@ export type ReactReplacerOutput = ReplacerOutput<ReactElement>;
 export function reactReplacer(
   input: ReplacerInput<ReactElement>,
   rules: ReactRules,
-  options?: ReplacerOptions | string,
+  options?: ReplacerOptions,
 ): ReactReplacerOutput {
   return stringReplacer<ReactElement>(input, rules, options);
 }

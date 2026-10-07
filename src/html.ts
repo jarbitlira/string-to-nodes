@@ -48,7 +48,7 @@ export function toHtml(output: ReplacerOutput<SafeHtml>): string {
 export function htmlReplacer(
   input: ReplacerInput<SafeHtml>,
   rules: HtmlRules,
-  options?: ReplacerOptions | string,
+  options?: ReplacerOptions,
 ): string {
   return toHtml(stringReplacer<SafeHtml>(input, rules, options));
 }

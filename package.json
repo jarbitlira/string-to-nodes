@@ -1,6 +1,6 @@
 {
   "name": "string-to-nodes",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Framework-agnostic recursive string replacement: turn strings into arrays of React elements, Vue VNodes, DOM nodes or safe HTML.",
   "license": "MIT",
   "repository": {

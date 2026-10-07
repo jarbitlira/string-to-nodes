@@ -51,11 +51,11 @@ test('ignore suppresses later rule inside match', () => {
   assert.deepEqual((out[2] as N).children, ['https://x.com/#nope']);
 });
 
-test('string patterns: literal, case-insensitive default, caseSensitive opt-in', () => {
+test('string patterns: literal, case-sensitive default, caseSensitive: false opt-in', () => {
   const r = (caseSensitive?: boolean) =>
     stringReplacer<N>('a.b A.B', {d: {pattern: 'a.', caseSensitive, matcherFn: el('i')}});
-  assert.equal(r().filter(x => typeof x !== 'string').length, 2);
-  assert.equal(r(true).filter(x => typeof x !== 'string').length, 1);
+  assert.equal(r().filter(x => typeof x !== 'string').length, 1);
+  assert.equal(r(false).filter(x => typeof x !== 'string').length, 2);
 });
 
 test('count is global per call', () => {
@@ -83,7 +83,7 @@ test('captures, groups, index, offset', () => {
 
 test('chaining passes nodes through, drops null/undefined', () => {
   const first = stringReplacer<N>('hi @ian #tag', {m: {pattern: /@\w+/, matcherFn: el('u')}});
-  const out = stringReplacer<N>([...first, null], {h: {pattern: /#\w+/, matcherFn: el('t')}}, '1');
+  const out = stringReplacer<N>([...first, null], {h: {pattern: /#\w+/, matcherFn: el('t')}}, {parentKey: '1'});
   assert.deepEqual(
     out.map(x => (typeof x === 'string' ? x : x.tag)),
     ['hi ', 'u', ' ', 't'],

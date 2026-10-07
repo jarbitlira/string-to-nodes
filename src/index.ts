@@ -47,7 +47,7 @@ export type ReplacerRule<T> = {
   textFn?: (rawText: string, match: Omit<ReplacerMatch, 'text'>) => string;
   /** Names of later rules to skip inside this rule's matches. */
   ignore?: string[];
-  /** String patterns only. Default false (case-insensitive). */
+  /** String patterns only. Default true; pass false for case-insensitive matching. */
   caseSensitive?: boolean;
   /** Max replacements for this rule across the whole call. */
   count?: number;
@@ -76,7 +76,7 @@ function toGlobalRegExp<T>(rule: ReplacerRule<T>): RegExp {
   const {pattern} = rule;
   const re =
     typeof pattern === 'string'
-      ? new RegExp(escapeRegExp(pattern), rule.caseSensitive ? 'g' : 'gi')
+      ? new RegExp(escapeRegExp(pattern), rule.caseSensitive === false ? 'gi' : 'g')
       : new RegExp(
           pattern.source,
           pattern.flags.includes('g') ? pattern.flags : `${pattern.flags}g`,
@@ -159,10 +159,9 @@ function apply<T>(
 export function stringReplacer<T>(
   input: ReplacerInput<T>,
   rules: ReplacerRules<T>,
-  options: ReplacerOptions | string = {},
+  options: ReplacerOptions = {},
 ): ReplacerOutput<T> {
-  const parentKey =
-    (typeof options === 'string' ? options : options.parentKey) ?? '0';
+  const parentKey = options.parentKey ?? '0';
   const ctx: Context<T> = {
     rules,
     remaining: new Map(
@@ -201,7 +200,7 @@ export function defineRules<T>(rules: ReplacerRules<T>): ReplacerRules<T> {
  * Adapters are built on top of this.
  */
 export function createReplacer<T>(rules: ReplacerRules<T>) {
-  return (input: ReplacerInput<T>, options?: ReplacerOptions | string) =>
+  return (input: ReplacerInput<T>, options?: ReplacerOptions) =>
     stringReplacer(input, rules, options);
 }
 

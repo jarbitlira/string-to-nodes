@@ -46,7 +46,7 @@ export function toFragment(
 export function domReplacer(
   input: ReplacerInput<Node>,
   rules: DomRules,
-  options?: ReplacerOptions | string,
+  options?: ReplacerOptions,
   doc: DocumentLike = globalThis.document,
 ): DocumentFragment {
   return toFragment(stringReplacer<Node>(input, rules, options), doc);

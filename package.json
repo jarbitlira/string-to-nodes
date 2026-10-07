@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "Framework-agnostic recursive string replacement: turn strings into arrays of React elements, Vue VNodes, DOM nodes or safe HTML.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jarbitlira/string-to-nodes.git"
+  },
   "type": "module",
   "sideEffects": false,
   "files": [

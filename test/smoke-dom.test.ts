@@ -6,13 +6,13 @@ import type {DomRules} from '../src/dom';
 
 test('dom adapter builds a real DOM tree through happy-dom, not a mock', () => {
   const window = new Window();
-  const document = window.document as unknown as Document;
+  globalThis.document = window.document as unknown as Document;
 
   const rules: DomRules = {
     bold: {
       pattern: /\*\*[^*]+\*\*/g,
       textFn: t => t.slice(2, -2),
-      matcherFn: (_raw, children) => appendOutput(document.createElement('strong'), children, document),
+      matcherFn: (_raw, children) => appendOutput(document.createElement('strong'), children),
     },
     url: {
       pattern: /https?:\/\/\S+/g,
@@ -25,7 +25,7 @@ test('dom adapter builds a real DOM tree through happy-dom, not a mock', () => {
     },
   };
 
-  const frag = domReplacer('Check **this** out: https://example.com', rules, undefined, document);
+  const frag = domReplacer('Check **this** out: https://example.com', rules);
 
   const container = document.createElement('div');
   container.appendChild(frag);

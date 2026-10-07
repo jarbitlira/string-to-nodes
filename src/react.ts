@@ -11,18 +11,15 @@ import {
   type ReplacerInput,
   type ReplacerOptions,
   type ReplacerOutput,
-  type ReplacerRule,
   type ReplacerRules,
 } from './index';
 
-export type ReactRule = ReplacerRule<ReactElement>;
 export type ReactRules = ReplacerRules<ReactElement>;
-export type ReactReplacerOutput = ReplacerOutput<ReactElement>;
 
 export function reactReplacer(
   input: ReplacerInput<ReactElement>,
   rules: ReactRules,
   options?: ReplacerOptions,
-): ReactReplacerOutput {
+): ReplacerOutput<ReactElement> {
   return stringReplacer<ReactElement>(input, rules, options);
 }

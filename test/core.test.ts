@@ -1,8 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {stringReplacer, defineRules, createReplacer} from '../src/index';
+import {stringReplacer} from '../src/index';
 import {htmlReplacer, safe, escapeHtml, toHtml} from '../src/html';
-import {toFragment} from '../src/dom';
 
 // A framework-free node type: plain objects.
 type N = {tag: string; key: string; children: Array<string | N>};
@@ -96,12 +95,6 @@ test('edge cases: empty input, zero-length matches, no rules', () => {
   assert.deepEqual(stringReplacer<N>('ab', {}), ['ab']);
 });
 
-test('defineRules / createReplacer', () => {
-  const rules = defineRules<N>({x: {pattern: 'x', matcherFn: el('x')}});
-  const replace = createReplacer(rules);
-  assert.equal(replace('axb').length, 3);
-});
-
 test('html adapter escapes text, keeps safe html', () => {
   const html = htmlReplacer('<b>hi</b> https://x.com?a=1&b=2', {
     url: {
@@ -122,15 +115,4 @@ test('html adapter escapes text, keeps safe html', () => {
     },
   });
   assert.equal(nested, '<strong>&lt;x&gt;</strong>');
-});
-
-test('dom adapter builds fragment with text nodes', () => {
-  type FakeNode = {kind: string; value?: string; children: FakeNode[]; appendChild(n: FakeNode): FakeNode};
-  const mk = (kind: string, value?: string): FakeNode => ({
-    kind, value, children: [],
-    appendChild(n) { this.children.push(n); return n; },
-  });
-  const doc = {createTextNode: (t: string) => mk('text', t), createDocumentFragment: () => mk('frag')};
-  const frag = toFragment(['a', mk('em') as never, 'b'], doc as never) as unknown as FakeNode;
-  assert.deepEqual(frag.children.map(c => c.kind), ['text', 'em', 'text']);
 });

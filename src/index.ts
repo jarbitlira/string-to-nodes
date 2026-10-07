@@ -62,27 +62,18 @@ export type ReplacerOptions = {
 
 type Context<T> = {
   rules: ReplacerRules<T>;
-  remaining: Map<string, number>;
+  regexps: Record<string, RegExp>;
+  remaining: Record<string, number>;
 };
 
 const REGEXP_CHARS = /[\\^$.*+?()[\]{}|]/g;
 const escapeRegExp = (s: string) => s.replace(REGEXP_CHARS, '\\$&');
 
-const compiled = new WeakMap<ReplacerRule<unknown>, RegExp>();
-
-function toGlobalRegExp<T>(rule: ReplacerRule<T>): RegExp {
-  const cached = compiled.get(rule as ReplacerRule<unknown>);
-  if (cached) return cached;
-  const {pattern} = rule;
-  const re =
-    typeof pattern === 'string'
-      ? new RegExp(escapeRegExp(pattern), rule.caseSensitive === false ? 'gi' : 'g')
-      : new RegExp(
-          pattern.source,
-          pattern.flags.includes('g') ? pattern.flags : `${pattern.flags}g`,
-        );
-  compiled.set(rule as ReplacerRule<unknown>, re);
-  return re;
+function toGlobalRegExp<T>({pattern, caseSensitive}: ReplacerRule<T>): RegExp {
+  if (typeof pattern === 'string') {
+    return new RegExp(escapeRegExp(pattern), caseSensitive === false ? 'gi' : 'g');
+  }
+  return new RegExp(pattern.source, pattern.flags.includes('g') ? pattern.flags : `${pattern.flags}g`);
 }
 
 function apply<T>(
@@ -110,11 +101,11 @@ function apply<T>(
   };
 
   // matchAll iterates over a clone, so recursion never disturbs lastIndex.
-  for (const m of str.matchAll(toGlobalRegExp(rule))) {
+  for (const m of str.matchAll(ctx.regexps[name])) {
     const rawText = m[0];
     if (rawText === '') continue; // skip zero-length matches
 
-    const left = ctx.remaining.get(name);
+    const left = ctx.remaining[name];
     if (left !== undefined && left <= 0) break;
 
     const offset = m.index ?? 0;
@@ -140,7 +131,7 @@ function apply<T>(
 
     matchIndex += 1;
     cursor = offset + rawText.length;
-    if (left !== undefined) ctx.remaining.set(name, left - 1);
+    if (left !== undefined) ctx.remaining[name] = left - 1;
   }
 
   pushNonMatch(str.slice(cursor));
@@ -162,15 +153,12 @@ export function stringReplacer<T>(
   options: ReplacerOptions = {},
 ): ReplacerOutput<T> {
   const parentKey = options.parentKey ?? '0';
-  const ctx: Context<T> = {
-    rules,
-    remaining: new Map(
-      Object.entries(rules)
-        .filter(([, r]) => Number.isInteger(r.count))
-        .map(([n, r]) => [n, r.count as number]),
-    ),
-  };
   const ruleNames = Object.keys(rules);
+  const ctx: Context<T> = {rules, regexps: {}, remaining: {}};
+  for (const name of ruleNames) {
+    ctx.regexps[name] = toGlobalRegExp(rules[name]);
+    if (Number.isInteger(rules[name].count)) ctx.remaining[name] = rules[name].count!;
+  }
 
   if (typeof input === 'string') return apply(input, ruleNames, ctx, parentKey);
 
@@ -184,24 +172,3 @@ export function stringReplacer<T>(
   });
   return out;
 }
-
-/**
- * Identity helper that pins the node type, so rule objects declared on their
- * own (outside a stringReplacer call) still infer `matcherFn` parameters.
- *
- *   const rules = defineRules<ReactElement>({ url: { … } });
- */
-export function defineRules<T>(rules: ReplacerRules<T>): ReplacerRules<T> {
-  return rules;
-}
-
-/**
- * Bind a rule set once; returns a reusable replace function. A thin wrapper
- * around stringReplacer; the adapters call stringReplacer directly.
- */
-export function createReplacer<T>(rules: ReplacerRules<T>) {
-  return (input: ReplacerInput<T>, options?: ReplacerOptions) =>
-    stringReplacer(input, rules, options);
-}
-
-export default stringReplacer;

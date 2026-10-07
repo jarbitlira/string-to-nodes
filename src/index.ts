@@ -1,5 +1,5 @@
 /**
- * string-replacer — framework-agnostic recursive string replacement.
+ * string-to-nodes — framework-agnostic recursive string replacement.
  *
  * Turns a string into an array of plain strings and "nodes" of any type T
  * (React elements, Vue VNodes, DOM nodes, safe-HTML objects, plain objects…).
@@ -196,8 +196,8 @@ export function defineRules<T>(rules: ReplacerRules<T>): ReplacerRules<T> {
 }
 
 /**
- * Bind a node type and rule set once; returns a reusable replace function.
- * Adapters are built on top of this.
+ * Bind a rule set once; returns a reusable replace function. A thin wrapper
+ * around stringReplacer; the adapters call stringReplacer directly.
  */
 export function createReplacer<T>(rules: ReplacerRules<T>) {
   return (input: ReplacerInput<T>, options?: ReplacerOptions) =>

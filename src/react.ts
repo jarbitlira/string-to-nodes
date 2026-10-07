@@ -2,7 +2,7 @@
  * React / React Native adapter. React is only a type import, so this entry
  * adds no runtime dependency on React.
  *
- *   import {reactReplacer, type ReactRules} from 'string-replacer/react';
+ *   import {reactReplacer, type ReactRules} from 'string-to-nodes/react';
  *   <Text>{reactReplacer(body, RULES)}</Text>
  */
 import type {ReactElement} from 'react';

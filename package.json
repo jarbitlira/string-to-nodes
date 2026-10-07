@@ -12,9 +12,6 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": {
@@ -62,10 +59,9 @@
     "build": "tsup",
     "test": "tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "lint:package": "publint && attw --pack . --profile node16",
-    "size": "size-limit",
     "prepublishOnly": "npm run typecheck && npm test && npm run build && npm run lint:package",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint:package": "npx publint && npx @arethetypeswrong/cli --pack . --profile node16"
   },
   "peerDependencies": {
     "@types/react": ">=17"
@@ -76,31 +72,19 @@
     }
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.18.5",
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
-    "@size-limit/preset-small-lib": "^14.1.0",
     "@types/node": "^26.6.4",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.3.0",
-    "@vue/server-renderer": "^3.5.43",
     "happy-dom": "^20.14.5",
     "husky": "^9.1.7",
-    "publint": "^0.3.25",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "size-limit": "^14.1.0",
     "tsup": "^8.0.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.6.0",
-    "vue": "^3.5.43"
+    "typescript": "^5.6.0"
   },
-  "size-limit": [
-    {
-      "path": "dist/index.js",
-      "limit": "1.5 kB"
-    }
-  ],
   "keywords": [
     "string",
     "replace",

@@ -77,11 +77,11 @@ htmlReplacer('<b>hi</b> https://x.com', {
 
 ```ts
 import {h, type VNode} from 'vue';
-import {stringReplacer, defineRules} from 'string-to-nodes';
+import {stringReplacer, type ReplacerRules} from 'string-to-nodes';
 
-const rules = defineRules<VNode>({
+const rules: ReplacerRules<VNode> = {
   url: {pattern: /https?:\/\/\S+/g, matcherFn: (raw, _p, key) => h('a', {key, href: raw}, raw)},
-});
+};
 // render: () => h('p', stringReplacer(text, rules))
 ```
 

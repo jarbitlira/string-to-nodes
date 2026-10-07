@@ -35,11 +35,9 @@ function stringReplacer<T>(
   options?: {parentKey?: string}, // default parentKey '0'
 ): ReplacerOutput<T>;
 
-function defineRules<T>(rules: ReplacerRules<T>): ReplacerRules<T>; // typing helper
-function createReplacer<T>(rules: ReplacerRules<T>): (input, options?) => ReplacerOutput<T>;
 ```
 
-`T` is whatever your `matcherFn` returns. Declare rules with `defineRules<T>()` when they live outside the call, so the callback parameters are typed.
+`T` is whatever your `matcherFn` returns. Annotate rules declared outside the call as `ReplacerRules<T>` so the callback parameters are typed.
 
 ### The one rule about `T`
 
@@ -120,7 +118,7 @@ Prefer one rules object; chaining is mainly for incremental migration.
 ## Adapter notes
 
 - **`/react`**: React is a type-only import, so the adapter adds nothing at runtime. In React Native, nested `<Text>` renders inline; inside a `<View>`, every text segment must still be wrapped in `<Text>`.
-- **`/dom`**: text becomes `Text` nodes via `createTextNode`, never parsed as HTML. Use `appendOutput(parent, children)` to render nested children. Pass a `document` (jsdom, happy-dom, linkedom) as the last argument outside the browser.
+- **`/dom`**: text becomes `Text` nodes via `createTextNode`, never parsed as HTML. Use `appendOutput(parent, children)` to render nested children. It uses the global `document`; outside the browser, set `globalThis.document` (jsdom, happy-dom, linkedom) first.
 - **`/html`**: only `SafeHtml` built with `safe()` is inserted verbatim. Use `toHtml(processed)` inside a `matcherFn` to render nested children. Escape every interpolated value yourself.
 - **Svelte / Angular / Lit**: return plain data objects from `matcherFn` and render them with the framework's own templating (or use `/html` for string templates).
 

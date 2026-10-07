@@ -1,5 +1,9 @@
 # string-to-nodes
 
+[![CI](https://github.com/jarbitlira/string-to-nodes/actions/workflows/ci.yml/badge.svg)](https://github.com/jarbitlira/string-to-nodes/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/string-to-nodes.svg)](https://www.npmjs.com/package/string-to-nodes)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Framework-agnostic, recursive string replacement. Turn a string into an array of text and **nodes of any type**: React elements, Vue VNodes, Solid/Preact JSX, DOM nodes, or safe HTML strings. Zero dependencies, no DOM required, ~1 kB.
 
 ```ts

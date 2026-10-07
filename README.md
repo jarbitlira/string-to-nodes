@@ -88,20 +88,6 @@ function createReplacer<T>(rules: ReplacerRules<T>): (input, options?) => Replac
 
 `T` must not be a bare `string`. Output arrays mix plain text with nodes, and the library (and you) tell them apart with `typeof part === 'string'`. If you need string output, return a wrapper object, which is exactly what the `/html` adapter's `SafeHtml` does.
 
-## How it works
-
-Rules are applied in definition order. For each rule:
-
-1. Find every match with `String.prototype.matchAll` (the `g` flag is added if missing).
-2. Text **between** matches → processed by the rules defined *after* this one.
-3. Each **match** → `textFn` is applied, the result is processed by the later rules (minus any in `ignore`), then `matcherFn(rawText, processed, key, match)` builds the node.
-
-A rule never re-applies inside its own match and inner content only sees later rules, so recursion always terminates.
-
-### Why `matchAll` instead of `split`?
-
-Splitting a string on a regex requires a capturing group, and patterns with several or optional groups produce `undefined` entries and misaligned output. `matchAll` gives the full match as `rawText` regardless of groups, and exposes groups separately via `match.captures` / `match.groups` — so any RegExp works, with or without groups.
-
 ### Edge cases
 
 - Empty string input → `[]`.
@@ -256,4 +242,8 @@ const rules = defineRules<VNode>({
 ```
 
 **Angular / Lit / templating engines**: return plain data objects the same way, or use `/html` for string templates.
+
+---
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for how the matching/recursion engine works internally.
 

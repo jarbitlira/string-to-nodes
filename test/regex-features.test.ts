@@ -22,10 +22,20 @@ test('unicode (u) flag: a surrogate-pair emoji matches as one character, not two
   assert.ok(emojiMatch, 'expected the whole emoji to be a single match under the u flag');
 });
 
-test('unicode sets (v) flag: set-subtraction syntax in a character class is preserved', () => {
+test('unicode sets (v) flag: set-subtraction syntax in a character class is preserved', t => {
   // [\d--[13579]] = digits minus the odd ones = even digits only. This syntax is
   // only valid with the v flag, so a correct match here proves flags survive untouched.
-  const out = stringReplacer<N>('0123456789', {even: {pattern: /[\d--[13579]]/gv, matcherFn: el('e')}});
+  // Built via the RegExp constructor (not a literal) so unsupported engines throw a
+  // catchable error here instead of failing to parse the whole file (Node < 20).
+  let pattern: RegExp;
+  try {
+    pattern = new RegExp('[\\d--[13579]]', 'gv');
+  } catch {
+    t.skip('RegExp v flag (Unicode Sets) is not supported on this Node version');
+    return;
+  }
+
+  const out = stringReplacer<N>('0123456789', {even: {pattern, matcherFn: el('e')}});
   const text = out
     .filter((x): x is N => typeof x !== 'string')
     .map(m => m.text)
